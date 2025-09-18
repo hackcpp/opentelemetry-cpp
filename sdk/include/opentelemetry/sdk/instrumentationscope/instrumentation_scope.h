@@ -1,0 +1,146 @@
+// Copyright The OpenTelemetry Authors
+// SPDX-License-Identifier: Apache-2.0
+
+#pragma once
+
+#include <string>
+#include <type_traits>
+#include <memory>
+
+// #include "opentelemetry/common/key_value_iterable_view.h"
+#include "opentelemetry/sdk/common/attribute_utils.h"
+
+namespace opentelemetry {
+namespace sdk
+{
+namespace instrumentationscope
+{
+
+using InstrumentationScopeAttributes = opentelemetry::sdk::common::AttributeMap;
+
+class InstrumentationScope
+{
+public:
+  InstrumentationScope(const InstrumentationScope &) = default;
+
+  /**
+   * Returns a newly created InstrumentationScope with the specified library name and version.
+   * @param name name of the instrumentation scope.
+   * @param version version of the instrumentation scope.
+   * @param schema_url schema url of the telemetry emitted by the library.
+   * @param attributes attributes of the instrumentation scope.
+   * @returns the newly created InstrumentationScope.
+   */
+  static std::unique_ptr<InstrumentationScope> Create(
+      const std::string& name,
+      const std::string& version                  = "",
+      const std::string& schema_url               = "",
+      InstrumentationScopeAttributes &&attributes = {})
+  {
+    return std::unique_ptr<InstrumentationScope>(
+        new InstrumentationScope{name, version, schema_url, std::move(attributes)});
+  }
+
+  /**
+   * Returns a newly created InstrumentationScope with the specified library name and version.
+   * @param name name of the instrumentation scope.
+   * @param version version of the instrumentation scope.
+   * @param schema_url schema url of the telemetry emitted by the library.
+   * @param attributes attributes of the instrumentation scope.
+   * @returns the newly created InstrumentationScope.
+   */
+  static std::unique_ptr<InstrumentationScope> Create(
+      const std::string& name,
+      const std::string& version,
+      const std::string& schema_url,
+      const InstrumentationScopeAttributes &attributes)
+  {
+    return std::unique_ptr<InstrumentationScope>(new InstrumentationScope{
+        name, version, schema_url, InstrumentationScopeAttributes(attributes)});
+  }
+
+  std::size_t HashCode() const noexcept { return hash_code_; }
+
+  /**
+   * Compare 2 instrumentation libraries.
+   * @param other the instrumentation scope to compare to.
+   * @returns true if the 2 instrumentation libraries are equal, false otherwise.
+   */
+  bool operator==(const InstrumentationScope &other) const noexcept
+  {
+    return this->name_ == other.name_ && this->version_ == other.version_ &&
+           this->schema_url_ == other.schema_url_ && this->attributes_ == other.attributes_;
+  }
+
+  /**
+   * Check whether the instrumentation scope has given name and version.
+   * This could be used to check version equality and avoid heap allocation.
+   * @param name name of the instrumentation scope to compare.
+   * @param version version of the instrumentation scope to compare.
+   * @param schema_url schema url of the telemetry emitted by the scope.
+   * @param attributes attributes of the instrumentation scope to compare.
+   * @returns true if name and version in this instrumentation scope are equal with the given name
+   * and version.
+   */
+  bool equal(const std::string& name,
+             const std::string& version,
+             const std::string& schema_url                       = "",
+             const opentelemetry::common::KeyValueIterable *attributes = nullptr) const noexcept
+  {
+
+    if (this->name_ != name || this->version_ != version || this->schema_url_ != schema_url)
+    {
+      return false;
+    }
+
+    if (attributes == nullptr)
+    {
+      if (attributes_.empty())
+      {
+        return true;
+      }
+      return false;
+    }
+
+    return attributes_.EqualTo(*attributes);
+  }
+
+  const std::string &GetName() const noexcept { return name_; }
+  const std::string &GetVersion() const noexcept { return version_; }
+  const std::string &GetSchemaURL() const noexcept { return schema_url_; }
+  const InstrumentationScopeAttributes &GetAttributes() const noexcept { return attributes_; }
+
+  void SetAttribute(const std::string& key,
+                    const opentelemetry::common::AttributeValue &value) noexcept
+  {
+    attributes_[std::string(key)] = value;
+  }
+
+private:
+  InstrumentationScope(const std::string&name,
+                       const std::string& version,
+                       const std::string& schema_url               = "",
+                       InstrumentationScopeAttributes &&attributes = {})
+      : name_(name), version_(version), schema_url_(schema_url), attributes_(std::move(attributes))
+  {
+    std::string hash_data;
+    hash_data.reserve(name_.size() + version_.size() + schema_url_.size());
+    hash_data += name_;
+    hash_data += version_;
+    hash_data += schema_url_;
+    hash_code_ = std::hash<std::string>{}(hash_data);
+  }
+
+private:
+  std::string name_;
+  std::string version_;
+  std::string schema_url_;
+  std::size_t hash_code_;
+
+  InstrumentationScopeAttributes attributes_;
+};
+
+}  // namespace instrumentationscope
+}  // namespace sdk
+
+}  // namespace opentelemetry
