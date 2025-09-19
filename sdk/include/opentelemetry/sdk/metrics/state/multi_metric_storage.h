@@ -28,11 +28,18 @@ public:
     storages_.push_back(storage);
   }
 
-  virtual void RecordLong(uint64_t value, const opentelemetry::common::KeyValueIterable &attributes) noexcept override
+  virtual void RecordLong(int64_t value, const opentelemetry::common::KeyValueIterable &attributes) noexcept override
   {
       for (auto &s : storages_)
       {
           s->RecordLong(value, attributes);
+      }
+  }
+  virtual void RecordDouble(double value, const opentelemetry::common::KeyValueIterable &attributes) noexcept override
+  {
+      for (auto &s : storages_)
+      {
+          s->RecordDouble(value, attributes);
       }
   }
 

@@ -34,9 +34,20 @@ public:
     };
   }
 
-  void RecordLong(uint64_t value, const opentelemetry::common::KeyValueIterable &attributes) noexcept override
+  void RecordLong(int64_t value, const opentelemetry::common::KeyValueIterable &attributes) noexcept override
   {
     if (instrument_descriptor_.value_type_ != InstrumentValueType::kLong)
+    {
+      return;
+    }
+
+    std::lock_guard<opentelemetry::common::SpinLockMutex> guard(attribute_hashmap_lock_);
+    attributes_hashmap_->GetOrSetDefault(attributes, nullptr, create_default_aggregation_)->Aggregate(value);
+  }
+
+  void RecordDouble(double value, const opentelemetry::common::KeyValueIterable &attributes) noexcept override
+  {
+    if (instrument_descriptor_.value_type_ != InstrumentValueType::kDouble)
     {
       return;
     }

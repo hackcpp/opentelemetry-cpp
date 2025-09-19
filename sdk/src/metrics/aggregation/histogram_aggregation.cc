@@ -56,16 +56,16 @@ LongHistogramAggregation::LongHistogramAggregation(const HistogramPointData &dat
     : point_data_{data}, record_min_max_{point_data_.record_min_max_}
 {}
 
-void LongHistogramAggregation::Aggregate(uint64_t value,
+void LongHistogramAggregation::Aggregate(int64_t value,
                                          const PointAttributes & /* attributes */) noexcept
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   point_data_.count_ += 1;
-  point_data_.sum_ = point_data_.sum_ + value;
+  point_data_.sum_ = static_cast<int64_t>(nostd::get<int64_t>(point_data_.sum_)) + value;
   if (record_min_max_)
   {
-    point_data_.min_ = (std::min)(point_data_.min_, value);
-    point_data_.max_ = (std::max)(point_data_.max_, value);
+    point_data_.min_ = (std::min)(nostd::get<int64_t>(point_data_.min_), value);
+    point_data_.max_ = (std::max)(nostd::get<int64_t>(point_data_.max_), value);
   }
   size_t index = BucketBinarySearch(value, point_data_.boundaries_);
   point_data_.counts_[index] += 1;
@@ -74,29 +74,29 @@ void LongHistogramAggregation::Aggregate(uint64_t value,
 std::unique_ptr<Aggregation> LongHistogramAggregation::Merge(
     const Aggregation &delta) const noexcept
 {
-  // auto curr_value  = std::get<HistogramPointData>(ToPoint());
-  // auto delta_value = std::get<HistogramPointData>(
-  //     (static_cast<const LongHistogramAggregation &>(delta).ToPoint()));
-  // HistogramAggregationConfig agg_config;
-  // agg_config.boundaries_         = curr_value.boundaries_;
-  // agg_config.record_min_max_     = record_min_max_;
-  // LongHistogramAggregation *aggr = new LongHistogramAggregation(&agg_config);
-  // HistogramMerge<int64_t>(curr_value, delta_value, aggr->point_data_);
-  // return std::unique_ptr<Aggregation>(aggr);
+  auto curr_value  = nostd::get<HistogramPointData>(ToPoint());
+  auto delta_value = nostd::get<HistogramPointData>(
+      (static_cast<const LongHistogramAggregation &>(delta).ToPoint()));
+  HistogramAggregationConfig agg_config;
+  agg_config.boundaries_         = curr_value.boundaries_;
+  agg_config.record_min_max_     = record_min_max_;
+  LongHistogramAggregation *aggr = new LongHistogramAggregation(&agg_config);
+  HistogramMerge<int64_t>(curr_value, delta_value, aggr->point_data_);
+  return std::unique_ptr<Aggregation>(aggr);
   return nullptr;
 }
 
 std::unique_ptr<Aggregation> LongHistogramAggregation::Diff(const Aggregation &next) const noexcept
 {
-  // auto curr_value = std::get<HistogramPointData>(ToPoint());
-  // auto next_value = std::get<HistogramPointData>(
-  //     (static_cast<const LongHistogramAggregation &>(next).ToPoint()));
-  // HistogramAggregationConfig agg_config;
-  // agg_config.boundaries_         = curr_value.boundaries_;
-  // agg_config.record_min_max_     = record_min_max_;
-  // LongHistogramAggregation *aggr = new LongHistogramAggregation(&agg_config);
-  // HistogramDiff<int64_t>(curr_value, next_value, aggr->point_data_);
-  // return std::unique_ptr<Aggregation>(aggr);
+  auto curr_value = nostd::get<HistogramPointData>(ToPoint());
+  auto next_value = nostd::get<HistogramPointData>(
+      (static_cast<const LongHistogramAggregation &>(next).ToPoint()));
+  HistogramAggregationConfig agg_config;
+  agg_config.boundaries_         = curr_value.boundaries_;
+  agg_config.record_min_max_     = record_min_max_;
+  LongHistogramAggregation *aggr = new LongHistogramAggregation(&agg_config);
+  HistogramDiff<int64_t>(curr_value, next_value, aggr->point_data_);
+  return std::unique_ptr<Aggregation>(aggr);
   return nullptr;
 }
 
@@ -143,11 +143,11 @@ void DoubleHistogramAggregation::Aggregate(double value,
 {
   const std::lock_guard<opentelemetry::common::SpinLockMutex> locked(lock_);
   point_data_.count_ += 1;
-  point_data_.sum_ = point_data_.sum_ + value;
+  point_data_.sum_ = static_cast<double>(nostd::get<double>(point_data_.sum_)) + value;
   if (record_min_max_)
   {
-    // point_data_.min_ = (std::min)(point_data_.min_, value);
-    // point_data_.max_ = (std::max)(point_data_.max_, value);
+    point_data_.min_ = (std::min)(nostd::get<double>(point_data_.min_), value);
+    point_data_.max_ = (std::max)(nostd::get<double>(point_data_.max_), value);
   }
   size_t index = BucketBinarySearch(value, point_data_.boundaries_);
   point_data_.counts_[index] += 1;
@@ -156,30 +156,30 @@ void DoubleHistogramAggregation::Aggregate(double value,
 std::unique_ptr<Aggregation> DoubleHistogramAggregation::Merge(
     const Aggregation &delta) const noexcept
 {
-  // auto curr_value  = std::get<HistogramPointData>(ToPoint());
-  // auto delta_value = std::get<HistogramPointData>(
-  //     (static_cast<const DoubleHistogramAggregation &>(delta).ToPoint()));
-  // HistogramAggregationConfig agg_config;
-  // agg_config.boundaries_           = curr_value.boundaries_;
-  // agg_config.record_min_max_       = record_min_max_;
-  // DoubleHistogramAggregation *aggr = new DoubleHistogramAggregation(&agg_config);
-  // HistogramMerge<double>(curr_value, delta_value, aggr->point_data_);
-  // return std::unique_ptr<Aggregation>(aggr);
+  auto curr_value  = nostd::get<HistogramPointData>(ToPoint());
+  auto delta_value = nostd::get<HistogramPointData>(
+      (static_cast<const DoubleHistogramAggregation &>(delta).ToPoint()));
+  HistogramAggregationConfig agg_config;
+  agg_config.boundaries_           = curr_value.boundaries_;
+  agg_config.record_min_max_       = record_min_max_;
+  DoubleHistogramAggregation *aggr = new DoubleHistogramAggregation(&agg_config);
+  HistogramMerge<double>(curr_value, delta_value, aggr->point_data_);
+  return std::unique_ptr<Aggregation>(aggr);
   return nullptr;
 }
 
 std::unique_ptr<Aggregation> DoubleHistogramAggregation::Diff(
     const Aggregation &next) const noexcept
 {
-  // auto curr_value = ToPoint();
-  // auto next_value = std::get<HistogramPointData>(
-  //     (static_cast<const DoubleHistogramAggregation &>(next).ToPoint()));
-  // HistogramAggregationConfig agg_config;
-  // agg_config.boundaries_           = curr_value.boundaries_;
-  // agg_config.record_min_max_       = record_min_max_;
-  // DoubleHistogramAggregation *aggr = new DoubleHistogramAggregation(&agg_config);
-  // HistogramDiff<double>(curr_value, next_value, aggr->point_data_);
-  // return std::unique_ptr<Aggregation>(aggr);
+  auto curr_value = nostd::get<HistogramPointData>(ToPoint());
+  auto next_value = nostd::get<HistogramPointData>(
+      (static_cast<const DoubleHistogramAggregation &>(next).ToPoint()));
+  HistogramAggregationConfig agg_config;
+  agg_config.boundaries_           = curr_value.boundaries_;
+  agg_config.record_min_max_       = record_min_max_;
+  DoubleHistogramAggregation *aggr = new DoubleHistogramAggregation(&agg_config);
+  HistogramDiff<double>(curr_value, next_value, aggr->point_data_);
+  return std::unique_ptr<Aggregation>(aggr);
   return nullptr;
 }
 

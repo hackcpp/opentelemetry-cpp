@@ -15,27 +15,41 @@ macro(use_cxx11)
 endmacro(use_cxx11)
 
 
+# 设置Debug编译模式
+set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
+
 # 添加头部文件
 include_directories(
-  .
-  ./api/include
-  ./sdk/include)
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/api/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/sdk/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/exporters/otlp/include)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/third_party/include)
  
 # 添加代码源文件
-aux_source_directory(./sdk/src SOURCE_FILES)
-aux_source_directory(./sdk/src/metrics SOURCE_FILES)
-aux_source_directory(./sdk/src/metrics/state SOURCE_FILES)
-aux_source_directory(./sdk/src/metrics/aggregation SOURCE_FILES)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/sdk/src SOURCE_FILES)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/sdk/src/metrics SOURCE_FILES)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/sdk/src/metrics/state SOURCE_FILES)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/sdk/src/metrics/aggregation SOURCE_FILES)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/sdk/src/resource SOURCE_FILES)
 
-aux_source_directory(./sdk/src/resource SOURCE_FILES)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/exporters/otlp/src SOURCE_FILES)
 
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/opentelemetry/proto/common/v1  SOURCE_FILES)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/opentelemetry/proto/resource/v1  SOURCE_FILES)
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/opentelemetry/proto/metrics/v1  SOURCE_FILES)
+
+aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/opentelemetry/proto/collector/metrics/v1  SOURCE_FILES)
  
 # 输出
-add_library(opentelemetry STATIC ${SOURCE_FILES})
+add_library(opentelemetry SHARED ${SOURCE_FILES})
 
 # 添加可执行文件
 add_executable(test_opentelemetry main.cpp)
 target_link_libraries(test_opentelemetry opentelemetry)
+target_link_libraries(test_opentelemetry ${CMAKE_CURRENT_SOURCE_DIR}/third_party/libs/libprotobuf.a)
  
 
 message(STATUS "")

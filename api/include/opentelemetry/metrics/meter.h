@@ -10,17 +10,17 @@ namespace opentelemetry {
 namespace metrics
 {
 
-// template <typename T>
-// class Counter;
+template <typename T>
+class Counter;
 
 template <typename T>
 class Histogram;
 
-// template <typename T>
-// class UpDownCounter;
+template <typename T>
+class UpDownCounter;
 
-// template <typename T>
-// class Gauge;
+template <typename T>
+class Gauge;
 
 // class ObservableInstrument;
 
@@ -46,15 +46,15 @@ public:
    * @return a shared pointer to the created Counter.
    */
 
-//   virtual nostd::unique_ptr<Counter<uint64_t>> CreateUInt64Counter(
-//       nostd::string_view name,
-//       nostd::string_view description = "",
-//       nostd::string_view unit        = "") noexcept = 0;
+  virtual std::unique_ptr<Counter<uint64_t>> CreateUInt64Counter(
+      const std::string& name,
+      const std::string& description = "",
+      const std::string& unit        = "") noexcept = 0;
 
-//   virtual nostd::unique_ptr<Counter<double>> CreateDoubleCounter(
-//       nostd::string_view name,
-//       nostd::string_view description = "",
-//       nostd::string_view unit        = "") noexcept = 0;
+  virtual std::unique_ptr<Counter<double>> CreateDoubleCounter(
+      const std::string& name,
+      const std::string& description = "",
+      const std::string& unit        = "") noexcept = 0;
 
   /**
    * Creates a Asynchronous (Observable) counter with the passed characteristics and returns a
@@ -87,10 +87,10 @@ public:
       const std::string& description = "",
       const std::string& unit        = "") noexcept = 0;
 
-//   virtual nostd::unique_ptr<Histogram<double>> CreateDoubleHistogram(
-//       nostd::string_view name,
-//       nostd::string_view description = "",
-//       nostd::string_view unit        = "") noexcept = 0;
+  virtual std::unique_ptr<Histogram<double>> CreateDoubleHistogram(
+      const std::string& name,
+      const std::string& description = "",
+      const std::string& unit        = "") noexcept = 0;
 
 // #if OPENTELEMETRY_ABI_VERSION_NO >= 2
 //   /**
@@ -140,15 +140,15 @@ public:
    * @param unit the unit of metric values following https://unitsofmeasure.org/ucum.html.
    * @return a shared pointer to the created UpDownCounter.
    */
-//   virtual nostd::unique_ptr<UpDownCounter<int64_t>> CreateInt64UpDownCounter(
-//       nostd::string_view name,
-//       nostd::string_view description = "",
-//       nostd::string_view unit        = "") noexcept = 0;
+  virtual std::unique_ptr<UpDownCounter<int64_t>> CreateInt64UpDownCounter(
+      const std::string& name,
+      const std::string& description = "",
+      const std::string& unit        = "") noexcept = 0;
 
-//   virtual nostd::unique_ptr<UpDownCounter<double>> CreateDoubleUpDownCounter(
-//       nostd::string_view name,
-//       nostd::string_view description = "",
-//       nostd::string_view unit        = "") noexcept = 0;
+  virtual std::unique_ptr<UpDownCounter<double>> CreateDoubleUpDownCounter(
+      const std::string& name,
+      const std::string& description = "",
+      const std::string& unit        = "") noexcept = 0;
 
   /**
    * Creates a Asynchronous (Observable) UpDownCounter with the passed characteristics and returns

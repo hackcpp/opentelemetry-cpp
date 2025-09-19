@@ -13,6 +13,7 @@
 
 #include "opentelemetry/common/attribute_value.h"
 #include "opentelemetry/common/key_value_iterable.h"
+#include "opentelemetry/nostd/variant.h"
 
 namespace opentelemetry {
 namespace sdk
@@ -29,7 +30,7 @@ namespace common
  *  - std::vector<uint64_t>
  *  - std::vector<uint8_t>
  */
-using OwnedAttributeValue = std::string;
+using OwnedAttributeValue = opentelemetry::common::AttributeValue;
 
 enum OwnedAttributeType
 {
@@ -271,7 +272,7 @@ public:
 
   // Convert non-owning key-value to owning std::string(key) and OwnedAttributeValue(value)
   void SetAttribute(const std::string& key,
-                    const std::string& value) noexcept
+                    const opentelemetry::common::AttributeValue &value) noexcept
   {
     (*this)[std::string(key)] = value;
   }

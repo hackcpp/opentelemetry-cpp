@@ -7,13 +7,11 @@
 
 #include "opentelemetry/sdk/metrics/aggregation/aggregation.h"
 // #include "opentelemetry/sdk/metrics/aggregation/base2_exponential_histogram_aggregation.h"
-// #include "opentelemetry/sdk/metrics/aggregation/drop_aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/drop_aggregation.h"
 #include "opentelemetry/sdk/metrics/aggregation/histogram_aggregation.h"
-// #include "opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h"
-// #include "opentelemetry/sdk/metrics/aggregation/sum_aggregation.h"
-// #include "opentelemetry/sdk/metrics/data/point_data.h"
+#include "opentelemetry/sdk/metrics/aggregation/lastvalue_aggregation.h"
+#include "opentelemetry/sdk/metrics/aggregation/sum_aggregation.h"
 #include "opentelemetry/sdk/metrics/instruments.h"
-// #include "opentelemetry/version.h"
 
 namespace opentelemetry {
 namespace sdk
@@ -33,21 +31,41 @@ public:
     auto aggr_type    = GetDefaultAggregationType(instrument_descriptor.type_, is_monotonic);
     switch (aggr_type)
     {
-      case AggregationType::kHistogram: {
-        if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
-        {
-          return (std::unique_ptr<Aggregation>(new LongHistogramAggregation(aggregation_config)));
-        }
-        else
-        {
-          return nullptr;
-        }
-
-        break;
+    case AggregationType::kSum:
+      if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
+      {
+        return std::unique_ptr<Aggregation>(new LongSumAggregation(is_monotonic));
       }
-      default:
-        return nullptr;
-    };
+      else
+      {
+        return std::unique_ptr<Aggregation>(new DoubleSumAggregation(is_monotonic));
+      }
+      break;
+    case AggregationType::kHistogram:
+    {
+      if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
+      {
+        return std::unique_ptr<Aggregation>(new LongHistogramAggregation(aggregation_config));
+      }
+      else
+      {
+        return std::unique_ptr<Aggregation>(new DoubleHistogramAggregation(aggregation_config));
+      }
+
+      break;
+    }
+    case AggregationType::kLastValue:
+      if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
+      {
+        return std::unique_ptr<Aggregation>(new LongLastValueAggregation());
+      }
+      else
+      {
+        return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation());
+      }
+    default:
+      return std::unique_ptr<Aggregation>(new DropAggregation());
+    }
   }
 
   static std::unique_ptr<Aggregation> CreateAggregation(
@@ -57,18 +75,50 @@ public:
   {
     switch (aggregation_type)
     {
-      case AggregationType::kHistogram:
-        if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
-        {
-          return std::unique_ptr<Aggregation>(new LongHistogramAggregation(aggregation_config));
-        }
-        else
-        {
-          return nullptr;
-        }
-        break;
-      default:
-        return nullptr;
+    case AggregationType::kDrop:
+      return std::unique_ptr<Aggregation>(new DropAggregation());
+      break;
+    case AggregationType::kHistogram:
+      if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
+      {
+        return std::unique_ptr<Aggregation>(new LongHistogramAggregation(aggregation_config));
+      }
+      else
+      {
+        return std::unique_ptr<Aggregation>(new DoubleHistogramAggregation(aggregation_config));
+      }
+      break;
+    case AggregationType::kLastValue:
+      if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
+      {
+        return std::unique_ptr<Aggregation>(new LongLastValueAggregation());
+      }
+      else
+      {
+        return std::unique_ptr<Aggregation>(new DoubleLastValueAggregation());
+      }
+      break;
+    case AggregationType::kSum:
+    {
+      bool is_monotonic = true;
+      if (instrument_descriptor.type_ == InstrumentType::kUpDownCounter ||
+          instrument_descriptor.type_ == InstrumentType::kObservableUpDownCounter ||
+          instrument_descriptor.type_ == InstrumentType::kHistogram)
+      {
+        is_monotonic = false;
+      }
+      if (instrument_descriptor.value_type_ == InstrumentValueType::kLong)
+      {
+        return std::unique_ptr<Aggregation>(new LongSumAggregation(is_monotonic));
+      }
+      else
+      {
+        return std::unique_ptr<Aggregation>(new DoubleSumAggregation(is_monotonic));
+      }
+      break;
+    }
+    default:
+      return DefaultAggregation::CreateAggregation(instrument_descriptor, aggregation_config);
     }
   }
  

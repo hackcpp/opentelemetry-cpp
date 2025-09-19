@@ -39,7 +39,8 @@ public:
 class SyncWritableMetricStorage
 {
 public:
-  virtual void RecordLong(uint64_t value, const opentelemetry::common::KeyValueIterable &attributes) noexcept = 0;
+  virtual void RecordLong(int64_t value, const opentelemetry::common::KeyValueIterable &attributes) noexcept = 0;
+  virtual void RecordDouble(double value, const opentelemetry::common::KeyValueIterable &attributes) noexcept = 0;
 
   virtual ~SyncWritableMetricStorage() = default;
 };

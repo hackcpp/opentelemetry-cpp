@@ -5,10 +5,7 @@
 
 #include <string>
 
-// #include "opentelemetry/nostd/span.h"
-// #include "opentelemetry/nostd/string_view.h"
-// #include "opentelemetry/nostd/variant.h"
-// #include "opentelemetry/version.h"
+#include "opentelemetry/nostd/variant.h"
 
 namespace opentelemetry {
 namespace common
@@ -35,7 +32,13 @@ namespace common
 /// used. There are no guarantees around how those values are handled by
 /// exporters.
 /// \endparblock
-using AttributeValue = std::string;
+using AttributeValue = nostd::variant<bool,
+                                      int32_t,
+                                      uint32_t,
+                                      int64_t,
+                                      uint64_t,
+                                      double,
+                                      std::string>;
 
 enum AttributeType
 {

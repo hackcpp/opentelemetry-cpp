@@ -65,12 +65,12 @@ public:
 class FilteringAttributesProcessor : public AttributesProcessor
 {
 public:
-  FilteringAttributesProcessor(std::unordered_map<std::string, bool> &&allowed_attribute_keys = {})
+  FilteringAttributesProcessor(std::unordered_map<std::string, bool> &&allowed_attribute_keys = std::unordered_map<std::string, bool>())
       : allowed_attribute_keys_(std::move(allowed_attribute_keys))
   {}
 
   FilteringAttributesProcessor(
-      const std::unordered_map<std::string, bool> &allowed_attribute_keys = {})
+      const std::unordered_map<std::string, bool> &allowed_attribute_keys = std::unordered_map<std::string, bool>())
       : allowed_attribute_keys_(allowed_attribute_keys)
   {}
 

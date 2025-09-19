@@ -37,7 +37,7 @@ public:
    */
 
   virtual AggregationTemporality GetAggregationTemporality(
-      InstrumentType instrument_type) const noexcept = 0;
+      InstrumentType instrument_type) const noexcept {return AggregationTemporality::kDelta;}
 
   /**
    * Shutdown the metric reader.

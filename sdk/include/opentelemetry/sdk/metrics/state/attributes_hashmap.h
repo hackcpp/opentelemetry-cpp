@@ -27,10 +27,10 @@ using opentelemetry::sdk::common::OrderedAttributeMap;
 
 constexpr size_t kAggregationCardinalityLimit = 2000;
 const std::string kAttributesLimitOverflowKey = "otel.metrics.overflow";
-const std::string kAttributesLimitOverflowValue      = "true";
-const MetricAttributes kOverflowAttributes    = {
-    {kAttributesLimitOverflowKey,
-        kAttributesLimitOverflowValue}};  // precalculated for optimization
+constexpr bool kAttributesLimitOverflowValue      = true;
+const MetricAttributes kOverflowAttributes = {
+  {kAttributesLimitOverflowKey, kAttributesLimitOverflowValue}
+}; // precalculated for optimization
 
 // class AttributeHashGenerator
 // {

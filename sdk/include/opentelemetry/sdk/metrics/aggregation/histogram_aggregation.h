@@ -15,7 +15,6 @@
 #include "opentelemetry/sdk/metrics/aggregation/aggregation_config.h"
 #include "opentelemetry/sdk/metrics/data/metric_data.h"
 #include "opentelemetry/sdk/metrics/data/point_data.h"
-// #include "opentelemetry/version.h"
 
 namespace opentelemetry {
 namespace sdk
@@ -31,7 +30,7 @@ public:
   LongHistogramAggregation(HistogramPointData &&);
   LongHistogramAggregation(const HistogramPointData &);
 
-  void Aggregate(uint64_t value, const PointAttributes &attributes = {}) noexcept override;
+  void Aggregate(int64_t value, const PointAttributes &attributes = {}) noexcept override;
 
   void Aggregate(double /* value */, const PointAttributes &attributes = {}) noexcept override {}
 
@@ -61,7 +60,7 @@ public:
   DoubleHistogramAggregation(HistogramPointData &&);
   DoubleHistogramAggregation(const HistogramPointData &);
 
-  void Aggregate(uint64_t /* value */, const PointAttributes & /* attributes */) noexcept override {}
+  void Aggregate(int64_t /* value */, const PointAttributes & /* attributes */) noexcept override {}
 
   void Aggregate(double value, const PointAttributes &attributes = {}) noexcept override;
 
@@ -94,13 +93,13 @@ void HistogramMerge(HistogramPointData &current,
     merge.counts_[i] = current.counts_[i] + delta.counts_[i];
   }
   merge.boundaries_     = current.boundaries_;
-  merge.sum_            = std::get<T>(current.sum_) + std::get<T>(delta.sum_);
+  merge.sum_            = nostd::get<T>(current.sum_) + nostd::get<T>(delta.sum_);
   merge.count_          = current.count_ + delta.count_;
   merge.record_min_max_ = current.record_min_max_ && delta.record_min_max_;
   if (merge.record_min_max_)
   {
-    merge.min_ = (std::min)(std::get<T>(current.min_), std::get<T>(delta.min_));
-    merge.max_ = (std::max)(std::get<T>(current.max_), std::get<T>(delta.max_));
+    merge.min_ = (std::min)(nostd::get<T>(current.min_), nostd::get<T>(delta.min_));
+    merge.max_ = (std::max)(nostd::get<T>(current.max_), nostd::get<T>(delta.max_));
   }
 }
 

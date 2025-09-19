@@ -33,7 +33,77 @@ public:
       std::unique_ptr<opentelemetry::sdk::instrumentationscope::InstrumentationScope> scope =
           opentelemetry::sdk::instrumentationscope::InstrumentationScope::Create("")) noexcept;
 
-  std::unique_ptr<opentelemetry::metrics::Histogram<uint64_t>> CreateUInt64Histogram(const std::string &name, const std::string &description = "", const std::string &unit = "") noexcept override;
+    std::unique_ptr<opentelemetry::metrics::Counter<uint64_t>> CreateUInt64Counter(
+      const std::string& name,
+      const std::string& description = "",
+      const std::string& unit        = "") noexcept override;
+
+    std::unique_ptr<opentelemetry::metrics::Counter<double>> CreateDoubleCounter(
+      const std::string& name,
+      const std::string& description = "",
+      const std::string& unit        = "") noexcept override;
+
+  // nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> CreateInt64ObservableCounter(
+  //     nostd::string_view name,
+  //     nostd::string_view description = "",
+  //     nostd::string_view unit        = "") noexcept override;
+
+  // nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> CreateDoubleObservableCounter(
+  //     nostd::string_view name,
+  //     nostd::string_view description = "",
+  //     nostd::string_view unit        = "") noexcept override;
+
+   std::unique_ptr<opentelemetry::metrics::Histogram<uint64_t>> CreateUInt64Histogram(
+      const std::string& name,
+      const std::string& description = "",
+      const std::string& unit        = "") noexcept override;
+
+   std::unique_ptr<opentelemetry::metrics::Histogram<double>> CreateDoubleHistogram(
+      const std::string& name,
+      const std::string& description = "",
+      const std::string& unit        = "") noexcept override;
+
+// #if OPENTELEMETRY_ABI_VERSION_NO >= 2
+//   nostd::unique_ptr<opentelemetry::metrics::Gauge<int64_t>> CreateInt64Gauge(
+//       nostd::string_view name,
+//       nostd::string_view description = "",
+//       nostd::string_view unit        = "") noexcept override;
+
+//   nostd::unique_ptr<opentelemetry::metrics::Gauge<double>> CreateDoubleGauge(
+//       nostd::string_view name,
+//       nostd::string_view description = "",
+//       nostd::string_view unit        = "") noexcept override;
+// #endif
+
+  // nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> CreateInt64ObservableGauge(
+  //     nostd::string_view name,
+  //     nostd::string_view description = "",
+  //     nostd::string_view unit        = "") noexcept override;
+
+  // nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument> CreateDoubleObservableGauge(
+  //     nostd::string_view name,
+  //     nostd::string_view description = "",
+  //     nostd::string_view unit        = "") noexcept override;
+
+  std::unique_ptr<opentelemetry::metrics::UpDownCounter<int64_t>> CreateInt64UpDownCounter(
+      const std::string& name,
+      const std::string& description = "",
+      const std::string& unit        = "") noexcept override;
+
+  std::unique_ptr<opentelemetry::metrics::UpDownCounter<double>> CreateDoubleUpDownCounter(
+      const std::string& name,
+      const std::string& description = "",
+      const std::string& unit        = "") noexcept override;
+
+  // nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
+  // CreateInt64ObservableUpDownCounter(nostd::string_view name,
+  //                                    nostd::string_view description = "",
+  //                                    nostd::string_view unit        = "") noexcept override;
+
+  // nostd::shared_ptr<opentelemetry::metrics::ObservableInstrument>
+  // CreateDoubleObservableUpDownCounter(nostd::string_view name,
+  //                                     nostd::string_view description = "",
+  //                                     nostd::string_view unit        = "") noexcept override;
 
   const sdk::instrumentationscope::InstrumentationScope *GetInstrumentationScope() const noexcept {
     return scope_.get();

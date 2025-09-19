@@ -2,3 +2,5 @@
 .vscode/
 build/
 *.json
+opentelemetry/proto/
+third_party/
